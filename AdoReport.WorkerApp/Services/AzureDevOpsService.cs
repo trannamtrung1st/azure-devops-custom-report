@@ -1,4 +1,8 @@
+using System.Text.Json;
+using AdoReport.WorkerApp.Data;
+using AdoReport.WorkerApp.Models;
 using AdoReport.WorkerApp.Services.Abstractions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
@@ -15,31 +19,18 @@ public class AzureDevOpsService : IAzureDevOpsService
     private readonly string _project;
     private readonly string _personalAccessToken;
     private readonly ILogger<AzureDevOpsService> _logger;
+    private readonly AppDbContext _dbContext;
 
-    public AzureDevOpsService(IConfiguration configuration, ILogger<AzureDevOpsService> logger)
+    public AzureDevOpsService(
+        IConfiguration configuration,
+        ILogger<AzureDevOpsService> logger,
+        AppDbContext dbContext)
     {
         _organization = configuration["AzureDevOps:Organization"] ?? throw new ArgumentNullException("AzureDevOps:Organization");
         _project = configuration["AzureDevOps:Project"] ?? throw new ArgumentNullException("AzureDevOps:Project");
         _personalAccessToken = configuration["AzureDevOps:PersonalAccessToken"] ?? throw new ArgumentNullException("AzureDevOps:PersonalAccessToken");
         _logger = logger;
-    }
-
-    public async Task<IEnumerable<WorkItem>> QueryAllTrackingWorkItems(CancellationToken cancellationToken = default)
-    {
-        var allWorkItems = new List<WorkItem>();
-        var userStories = await QueryTrackingUserStories(cancellationToken);
-        userStories = userStories.Where(us => us.Id.HasValue);
-        allWorkItems.AddRange(userStories);
-
-        foreach (var usBatch in userStories.Chunk(size: 20))
-        {
-            var tasks = await QueryTrackingTasks(usBatch.Select(us => us.Id!.Value), cancellationToken);
-            var bugs = await QueryTrackingBugs(usBatch.Select(us => us.Id!.Value), cancellationToken);
-            allWorkItems.AddRange(tasks);
-            allWorkItems.AddRange(bugs);
-        }
-
-        return allWorkItems;
+        _dbContext = dbContext;
     }
 
     public async Task<IEnumerable<WorkItem>> QueryTrackingUserStories(CancellationToken cancellationToken = default)
@@ -110,20 +101,117 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             LogWorkItems(currentBatch, "work items");
         }
 
+        workItems.ForEach(wi =>
+        {
+            if (wi.Fields.ContainsKey("System.Description"))
+                wi.Fields.Remove("System.Description");
+
+            if (wi.Fields.ContainsKey("System.History"))
+                wi.Fields.Remove("System.History");
+
+            if (wi.Fields.ContainsKey("Microsoft.VSTS.Common.AcceptanceCriteria"))
+                wi.Fields.Remove("Microsoft.VSTS.Common.AcceptanceCriteria");
+
+            if (wi.Fields.ContainsKey("Custom.BendendTechnicalApproach"))
+                wi.Fields.Remove("Custom.BendendTechnicalApproach");
+
+            if (wi.Fields.ContainsKey("Custom.FrontendTechnicalApproach"))
+                wi.Fields.Remove("Custom.FrontendTechnicalApproach");
+        });
+
         return workItems;
     }
 
     public void LogWorkItems(IEnumerable<WorkItem> workItems, string description)
     {
-        _logger.LogInformation("Retrieved {count} {description}", workItems.Count(), description);
+        _logger.LogDebug("Retrieved {count} {description}", workItems.Count(), description);
 
         foreach (var workItem in workItems)
         {
-            _logger.LogInformation("Work Item ID: {id}, Title: {title}, Type: {type}, State: {state}",
+            _logger.LogDebug("Work Item ID: {id}, Title: {title}, Type: {type}, State: {state}",
                 workItem.Id,
                 workItem.Fields.ContainsKey("System.Title") ? workItem.Fields["System.Title"] : "No Title",
                 workItem.Fields.ContainsKey("System.WorkItemType") ? workItem.Fields["System.WorkItemType"] : "Unknown Type",
                 workItem.Fields.ContainsKey("System.State") ? workItem.Fields["System.State"] : "Unknown State");
+        }
+    }
+
+    public async Task SaveWorkItemsToDatabase(IEnumerable<WorkItem> workItems, CancellationToken cancellationToken = default)
+    {
+        foreach (var workItem in workItems)
+        {
+            var existingWorkItem = await _dbContext.WorkItems
+                .Include(w => w.Fields)
+                .FirstOrDefaultAsync(w => w.Id == workItem.Id, cancellationToken);
+
+            if (existingWorkItem == null)
+            {
+                existingWorkItem = new WorkItemEntity
+                {
+                    Id = workItem.Id!.Value
+                };
+                _dbContext.WorkItems.Add(existingWorkItem);
+            }
+
+            // Update work item properties
+            existingWorkItem.Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty;
+            existingWorkItem.State = workItem.Fields["System.State"]?.ToString() ?? string.Empty;
+            existingWorkItem.Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty;
+
+            if (workItem.Fields.TryGetValue("System.AssignedTo", out object? value))
+            {
+                var assignedTo = value as IdentityRef;
+                existingWorkItem.AssignedTo = JsonSerializer.Serialize(assignedTo);
+            }
+            else
+            {
+                existingWorkItem.AssignedTo = null;
+            }
+
+            existingWorkItem.AreaPath = workItem.Fields.ContainsKey("System.AreaPath") ? workItem.Fields["System.AreaPath"]?.ToString() : null;
+            existingWorkItem.ParentId = workItem.Fields.ContainsKey("System.Parent") ? Convert.ToInt32(workItem.Fields["System.Parent"]) : null;
+            existingWorkItem.CreatedDate = Convert.ToDateTime(workItem.Fields["System.CreatedDate"]);
+            existingWorkItem.ChangedDate = workItem.Fields.ContainsKey("System.ChangedDate") ? Convert.ToDateTime(workItem.Fields["System.ChangedDate"]) : null;
+
+            // Update fields
+            var currentFields = existingWorkItem.Fields.ToDictionary(f => f.FieldName);
+
+            foreach (var field in workItem.Fields)
+            {
+                var fieldData = new WorkItemFieldData { Value = field.Value };
+                if (!currentFields.TryGetValue(field.Key, out var existingField))
+                {
+                    existingField = new WorkItemFieldEntity
+                    {
+                        WorkItemId = workItem.Id!.Value,
+                        FieldName = field.Key,
+                        FieldData = JsonSerializer.Serialize(fieldData)
+                    };
+                    existingWorkItem.Fields.Add(existingField);
+                }
+                else
+                {
+                    existingField.FieldData = JsonSerializer.Serialize(fieldData);
+                }
+            }
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Saved {count} work items to database", workItems.Count());
+    }
+
+    public async Task SaveAllWorkItemsToDatabase(CancellationToken cancellationToken = default)
+    {
+        var userStories = await QueryTrackingUserStories(cancellationToken);
+        userStories = userStories.Where(us => us.Id.HasValue);
+        await SaveWorkItemsToDatabase(userStories, cancellationToken);
+
+        foreach (var usBatch in userStories.Chunk(size: 20))
+        {
+            var tasks = await QueryTrackingTasks(usBatch.Select(us => us.Id!.Value), cancellationToken);
+            var bugs = await QueryTrackingBugs(usBatch.Select(us => us.Id!.Value), cancellationToken);
+            await SaveWorkItemsToDatabase(tasks, cancellationToken);
+            await SaveWorkItemsToDatabase(bugs, cancellationToken);
         }
     }
 }

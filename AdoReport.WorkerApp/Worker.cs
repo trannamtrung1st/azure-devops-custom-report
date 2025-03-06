@@ -1,5 +1,4 @@
 using AdoReport.WorkerApp.Services.Abstractions;
-using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace AdoReport.WorkerApp;
 
@@ -9,30 +8,37 @@ namespace AdoReport.WorkerApp;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private readonly IAzureDevOpsService _azureDevOpsService;
+    private readonly IServiceProvider _serviceProvider;
 
-    public Worker(ILogger<Worker> logger, IAzureDevOpsService azureDevOpsService)
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
     {
         _logger = logger;
-        _azureDevOpsService = azureDevOpsService;
+        _serviceProvider = serviceProvider;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Worker starting at: {time}", DateTimeOffset.Now);
+            try
+            {
+                _logger.LogInformation("Worker starting at: {time}", DateTimeOffset.Now);
 
-            var workItems = await _azureDevOpsService.QueryAllTrackingWorkItems(stoppingToken);
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var azureDevOpsService = scope.ServiceProvider.GetRequiredService<IAzureDevOpsService>();
+                    await azureDevOpsService.SaveAllWorkItemsToDatabase(stoppingToken);
+                }
 
-            _logger.LogInformation("Worker completed at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Worker completed at: {time}", DateTimeOffset.Now);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing work items");
+            }
+
+            // Wait for 1 hour before running again
+            await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while processing work items");
-        }
-
-        // Wait for 1 hour before running again
-        await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
     }
 }

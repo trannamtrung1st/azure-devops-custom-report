@@ -10,6 +10,7 @@ public interface IAzureDevOpsService
     Task<IEnumerable<WorkItem>> QueryTrackingUserStories(CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkItem>> QueryTrackingTasks(IEnumerable<int> userStoryIds, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkItem>> QueryTrackingBugs(IEnumerable<int> userStoryIds, CancellationToken cancellationToken = default);
-    Task<IEnumerable<WorkItem>> QueryAllTrackingWorkItems(CancellationToken cancellationToken = default);
-    void LogWorkItems(IEnumerable<WorkItem> workItems, string description);
+    Task<IEnumerable<WorkItem>> QueryWorkItems(Wiql wiql, CancellationToken cancellationToken = default);
+    Task SaveWorkItemsToDatabase(IEnumerable<WorkItem> workItems, CancellationToken cancellationToken = default);
+    Task SaveAllWorkItemsToDatabase(CancellationToken cancellationToken = default);
 }
