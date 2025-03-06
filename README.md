@@ -59,7 +59,7 @@ dotnet run
 
 ## Code Style Standards
 
-This project uses EditorConfig, Directory.Build.props, and .globalconfig to enforce consistent code style across the codebase.
+This project uses EditorConfig, Directory.Build.props to enforce consistent code style across the codebase.
 
 ### EditorConfig
 
@@ -68,10 +68,6 @@ The `.editorconfig` file defines coding styles like indentation, line endings, a
 ### Directory.Build.props
 
 The `Directory.Build.props` file sets common project properties like nullable reference types, implicit usings, and code analysis settings.
-
-### .globalconfig
-
-The `.globalconfig` file enforces .NET code style rules through analyzers.
 
 ### Key Conventions
 
@@ -91,3 +87,8 @@ The `.globalconfig` file enforces .NET code style rules through analyzers.
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## TODO list
+[TODO]
+[ ] Migrate views
+[ ] Track changes in Superset

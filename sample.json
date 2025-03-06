@@ -1,0 +1,315 @@
+{
+    "System.Id": 104126,
+    "System.Rev": 236,
+    "Custom.BABy": {
+        "Id": "fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "fb869bd3-beea-7e9c-89e6-e0782fd33c89",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "sophia.nguyen@ycloudassethealth.onmicrosoft.com",
+        "DisplayName": "Sophia Nguyen (BA)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "DisplayNameForXmlSerialization": "Sophia Nguyen (BA)"
+    },
+    "Custom.BEby": {
+        "Id": "a11e5799-b902-6946-a93a-6adc0b527c78",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/a11e5799-b902-6946-a93a-6adc0b527c78",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.YTExZTU3OTktYjkwMi03OTQ2LWE5M2EtNmFkYzBiNTI3Yzc4"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.YTExZTU3OTktYjkwMi03OTQ2LWE5M2EtNmFkYzBiNTI3Yzc4",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "a11e5799-b902-7946-a93a-6adc0b527c78",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "toan.tran@yokogawa.com",
+        "DisplayName": "Tran Duc, Toan (Toan.Tran yokogawa.com)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/a11e5799-b902-6946-a93a-6adc0b527c78",
+        "DisplayNameForXmlSerialization": "Tran Duc, Toan (Toan.Tran yokogawa.com)"
+    },
+    "Custom.FEby": {
+        "Id": "a11e5799-b902-6946-a93a-6adc0b527c78",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/a11e5799-b902-6946-a93a-6adc0b527c78",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.YTExZTU3OTktYjkwMi03OTQ2LWE5M2EtNmFkYzBiNTI3Yzc4"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.YTExZTU3OTktYjkwMi03OTQ2LWE5M2EtNmFkYzBiNTI3Yzc4",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "a11e5799-b902-7946-a93a-6adc0b527c78",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "toan.tran@yokogawa.com",
+        "DisplayName": "Tran Duc, Toan (Toan.Tran yokogawa.com)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/a11e5799-b902-6946-a93a-6adc0b527c78",
+        "DisplayNameForXmlSerialization": "Tran Duc, Toan (Toan.Tran yokogawa.com)"
+    },
+    "Custom.QCBy": {
+        "Id": "0b4c3061-b7c9-6f0f-9688-a19e368d8729",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/0b4c3061-b7c9-6f0f-9688-a19e368d8729",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.MGI0YzMwNjEtYjdjOS03ZjBmLTk2ODgtYTE5ZTM2OGQ4NzI5"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.MGI0YzMwNjEtYjdjOS03ZjBmLTk2ODgtYTE5ZTM2OGQ4NzI5",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "0b4c3061-b7c9-7f0f-9688-a19e368d8729",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "emma.nguyen@ycloudassethealth.onmicrosoft.com",
+        "DisplayName": "Emma Nguyen (QC)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/0b4c3061-b7c9-6f0f-9688-a19e368d8729",
+        "DisplayNameForXmlSerialization": "Emma Nguyen (QC)"
+    },
+    "System.Tags": "Alarm Mgt; Asset Management; CONFIRMED; Ready for demo",
+    "System.State": "Resolved",
+    "System.Title": "[Jira: AU-614][AM] Alarm Rule: Alarm Class",
+    "System.AreaId": 470,
+    "System.Parent": 56215,
+    "System.Reason": "Moved out of state Re-open",
+    "System.AreaPath": "Asset Backlogs\\Highland",
+    "System.NodeName": "Highland",
+    "System.PersonId": 293964819,
+    "Custom.BEDueDate": "2024-12-04T12:00:00Z",
+    "Custom.FEDueDate": "2024-12-16T12:00:00Z",
+    "Custom.USDueDate": "2025-02-21T00:00:00Z",
+    "System.ChangedBy": {
+        "Id": "bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "f250d4f0-1415-7a3f-a82b-0e74e71a72d0",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "trung.tran@yokogawa.com",
+        "DisplayName": "Trung Tran Nam",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "DisplayNameForXmlSerialization": "Trung Tran Nam"
+    },
+    "System.CreatedBy": {
+        "Id": "fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "fb869bd3-beea-7e9c-89e6-e0782fd33c89",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "sophia.nguyen@ycloudassethealth.onmicrosoft.com",
+        "DisplayName": "Sophia Nguyen (BA)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "DisplayNameForXmlSerialization": "Sophia Nguyen (BA)"
+    },
+    "System.Watermark": 676176,
+    "System.AreaLevel1": "Asset Backlogs",
+    "System.AreaLevel2": "Highland",
+    "System.AssignedTo": {
+        "Id": "fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZmI4NjliZDMtYmVlYS03ZTljLTg5ZTYtZTA3ODJmZDMzYzg5",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "fb869bd3-beea-7e9c-89e6-e0782fd33c89",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "sophia.nguyen@ycloudassethealth.onmicrosoft.com",
+        "DisplayName": "Sophia Nguyen (BA)",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/fb869bd3-beea-6e9c-89e6-e0782fd33c89",
+        "DisplayNameForXmlSerialization": "Sophia Nguyen (BA)"
+    },
+    "System.BoardColumn": "Resolved",
+    "System.ChangedDate": "2025-03-06T02:18:26.07Z",
+    "System.CreatedDate": "2024-08-13T10:09:13.333Z",
+    "System.IterationId": 498,
+    "System.RevisedDate": "9999-01-01T00:00:00Z",
+    "System.TeamProject": "Asset Backlogs",
+    "Custom.DEVStartDate": "2024-11-26T00:00:00Z",
+    "System.AuthorizedAs": {
+        "Id": "bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "f250d4f0-1415-7a3f-a82b-0e74e71a72d0",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "trung.tran@yokogawa.com",
+        "DisplayName": "Trung Tran Nam",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "DisplayNameForXmlSerialization": "Trung Tran Nam"
+    },
+    "System.CommentCount": 14,
+    "System.WorkItemType": "User Story",
+    "Custom.TotalQCEffort": 20,
+    "System.IterationPath": "Asset Backlogs\\Highland - Sprint 5",
+    "Custom.TotalDevEffort": 212,
+    "System.AuthorizedDate": "2025-03-06T02:18:26.07Z",
+    "System.BoardColumnDone": false,
+    "System.IterationLevel1": "Asset Backlogs",
+    "System.IterationLevel2": "Highland - Sprint 5",
+    "Custom.ActualTotalQCEffort": 32,
+    "Custom.CompletedStoryPoint": 0,
+    "Custom.RemainingStoryPoints": 5,
+    "Custom.TotalActualDevEffort": 189,
+    "Microsoft.VSTS.Common.Priority": 10,
+    "Microsoft.VSTS.Common.StackRank": 332131674,
+    "Microsoft.VSTS.Common.ValueArea": "Business",
+    "Microsoft.VSTS.Common.ResolvedBy": {
+        "Id": "bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "f250d4f0-1415-7a3f-a82b-0e74e71a72d0",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "trung.tran@yokogawa.com",
+        "DisplayName": "Trung Tran Nam",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "DisplayNameForXmlSerialization": "Trung Tran Nam"
+    },
+    "Microsoft.VSTS.Common.ActivatedBy": {
+        "Id": "bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Url": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "Links": {
+            "Links": {
+                "avatar": {
+                    "Href": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw"
+                }
+            }
+        },
+        "ImageUrl": "https://dev.azure.com/AssetHealthInsights/_apis/GraphProfile/MemberAvatars/aad.ZjI1MGQ0ZjAtMTQxNS03YTNmLWE4MmItMGU3NGU3MWE3MmQw",
+        "Inactive": false,
+        "Descriptor": {
+            "Identifier": "f250d4f0-1415-7a3f-a82b-0e74e71a72d0",
+            "SubjectType": "aad"
+        },
+        "ProfileUrl": null,
+        "UniqueName": "trung.tran@yokogawa.com",
+        "DisplayName": "Trung Tran Nam",
+        "IsContainer": false,
+        "IsAadIdentity": false,
+        "DirectoryAlias": null,
+        "IsDeletedInOrigin": false,
+        "UrlForXmlSerialization": "https://spsprodsea2.vssps.visualstudio.com/Ae88b19e5-f5ab-4873-bd1c-55283cb3b898/_apis/Identities/bcacfdf6-e216-4085-82db-7c7c20d3f50d",
+        "DisplayNameForXmlSerialization": "Trung Tran Nam"
+    },
+    "Microsoft.VSTS.Common.ResolvedDate": "2025-02-20T02:02:28.95Z",
+    "Microsoft.VSTS.Common.ActivatedDate": "2025-02-10T02:05:11.283Z",
+    "Microsoft.VSTS.Common.StateChangeDate": "2025-02-20T02:02:28.95Z",
+    "Microsoft.VSTS.Scheduling.StoryPoints": 5,
+    "WEF_582FCCC53B4242C2824FAE32457C4ADB_Kanban.Column": "New",
+    "WEF_5B0247391FB545F8A4622B562ABA16D9_Kanban.Column": "Resolved",
+    "WEF_A73B62E5E5C34F9D9C379098A3C0733D_Kanban.Column": "Resolved",
+    "WEF_582FCCC53B4242C2824FAE32457C4ADB_Kanban.Column.Done": false,
+    "WEF_5B0247391FB545F8A4622B562ABA16D9_Kanban.Column.Done": false,
+    "WEF_A73B62E5E5C34F9D9C379098A3C0733D_Kanban.Column.Done": false,
+    "WEF_582FCCC53B4242C2824FAE32457C4ADB_System.ExtensionMarker": false,
+    "WEF_5B0247391FB545F8A4622B562ABA16D9_System.ExtensionMarker": true,
+    "WEF_A73B62E5E5C34F9D9C379098A3C0733D_System.ExtensionMarker": false
+}

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AdoReport.WorkerApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250306172230_Initial")]
-    partial class Initial
+    [Migration("20250306183458_AddUsSummaryView")]
+    partial class AddUsSummaryView
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace AdoReport.WorkerApp.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemChangeEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AfterFields")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("BeforeFields")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("ChangedBy")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("ChangedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("WorkItemId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AfterFields");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("AfterFields"), "gin");
+
+                    b.HasIndex("BeforeFields");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("BeforeFields"), "gin");
+
+                    b.HasIndex("ChangedBy");
+
+                    b.HasIndex("ChangedDate");
+
+                    b.HasIndex("WorkItemId");
+
+                    b.ToTable("WorkItemChanges", (string)null);
+                });
 
             modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemEntity", b =>
                 {
@@ -84,6 +128,17 @@ namespace AdoReport.WorkerApp.Migrations
                     b.HasIndex("Type");
 
                     b.ToTable("WorkItems", (string)null);
+                });
+
+            modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemChangeEntity", b =>
+                {
+                    b.HasOne("AdoReport.WorkerApp.Models.WorkItemEntity", "WorkItem")
+                        .WithMany()
+                        .HasForeignKey("WorkItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("WorkItem");
                 });
 #pragma warning restore 612, 618
         }

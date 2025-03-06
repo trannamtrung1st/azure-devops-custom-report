@@ -32,6 +32,56 @@ namespace AdoReport.WorkerApp.Migrations
                     table.PrimaryKey("PK_WorkItems", x => x.Id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WorkItemChanges",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    WorkItemId = table.Column<int>(type: "integer", nullable: false),
+                    ChangedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ChangedBy = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    BeforeFields = table.Column<string>(type: "jsonb", nullable: true),
+                    AfterFields = table.Column<string>(type: "jsonb", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkItemChanges", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkItemChanges_WorkItems_WorkItemId",
+                        column: x => x.WorkItemId,
+                        principalTable: "WorkItems",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkItemChanges_AfterFields",
+                table: "WorkItemChanges",
+                column: "AfterFields")
+                .Annotation("Npgsql:IndexMethod", "gin");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkItemChanges_BeforeFields",
+                table: "WorkItemChanges",
+                column: "BeforeFields")
+                .Annotation("Npgsql:IndexMethod", "gin");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkItemChanges_ChangedBy",
+                table: "WorkItemChanges",
+                column: "ChangedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkItemChanges_ChangedDate",
+                table: "WorkItemChanges",
+                column: "ChangedDate");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkItemChanges_WorkItemId",
+                table: "WorkItemChanges",
+                column: "WorkItemId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_WorkItems_AreaPath",
                 table: "WorkItems",
@@ -72,6 +122,9 @@ namespace AdoReport.WorkerApp.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "WorkItemChanges");
+
             migrationBuilder.DropTable(
                 name: "WorkItems");
         }
