@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <!-- Enable nullable reference types -->
+    <Nullable>enable</Nullable>
+
+    <!-- Enable implicit usings -->
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Generate XML documentation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Suppress specific warnings -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>    <!-- Missing XML comment for publicly visible type or member -->
+  </PropertyGroup>
+</Project>
