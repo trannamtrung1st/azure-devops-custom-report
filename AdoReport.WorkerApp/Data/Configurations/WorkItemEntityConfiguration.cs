@@ -24,11 +24,11 @@ public class WorkItemEntityConfiguration : IEntityTypeConfiguration<WorkItemEnti
             .IsRequired()
             .HasMaxLength(500);
 
-        builder.Property(e => e.AssignedTo)
-            .HasColumnType("jsonb");
-
         builder.Property(e => e.AreaPath)
             .HasMaxLength(500);
+
+        builder.Property(e => e.Fields)
+            .HasColumnType("jsonb");
 
         builder.HasIndex(e => e.Type);
         builder.HasIndex(e => e.State);
@@ -37,13 +37,8 @@ public class WorkItemEntityConfiguration : IEntityTypeConfiguration<WorkItemEnti
         builder.HasIndex(e => e.CreatedDate);
         builder.HasIndex(e => e.ChangedDate);
 
-        // Create GIN index for the entire JSONB column
-        builder.HasIndex(e => e.AssignedTo)
+        // Create GIN index for the JSONB column
+        builder.HasIndex(e => e.Fields)
             .HasMethod("gin");
-
-        builder.HasMany(e => e.Fields)
-            .WithOne(e => e.WorkItem)
-            .HasForeignKey(e => e.WorkItemId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

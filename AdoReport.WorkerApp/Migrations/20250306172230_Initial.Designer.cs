@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AdoReport.WorkerApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250306161521_Initial")]
+    [Migration("20250306172230_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,14 +37,15 @@ namespace AdoReport.WorkerApp.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("AssignedTo")
-                        .HasColumnType("jsonb");
-
                     b.Property<DateTime?>("ChangedDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Fields")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.Property<int?>("ParentId")
                         .HasColumnType("integer");
@@ -68,13 +69,13 @@ namespace AdoReport.WorkerApp.Migrations
 
                     b.HasIndex("AreaPath");
 
-                    b.HasIndex("AssignedTo");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("AssignedTo"), "gin");
-
                     b.HasIndex("ChangedDate");
 
                     b.HasIndex("CreatedDate");
+
+                    b.HasIndex("Fields");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Fields"), "gin");
 
                     b.HasIndex("ParentId");
 
@@ -83,59 +84,6 @@ namespace AdoReport.WorkerApp.Migrations
                     b.HasIndex("Type");
 
                     b.ToTable("WorkItems", (string)null);
-                });
-
-            modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemFieldEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FieldData")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("FieldName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("WorkItemId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FieldData")
-                        .HasDatabaseName("IX_WorkItemFields_FieldData");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("FieldData"), "gin");
-
-                    b.HasIndex("FieldName")
-                        .HasDatabaseName("IX_WorkItemFields_FieldName");
-
-                    b.HasIndex("WorkItemId", "FieldName")
-                        .IsUnique()
-                        .HasDatabaseName("IX_WorkItemFields_WorkItemId_FieldName");
-
-                    b.ToTable("WorkItemFields", (string)null);
-                });
-
-            modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemFieldEntity", b =>
-                {
-                    b.HasOne("AdoReport.WorkerApp.Models.WorkItemEntity", "WorkItem")
-                        .WithMany("Fields")
-                        .HasForeignKey("WorkItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("WorkItem");
-                });
-
-            modelBuilder.Entity("AdoReport.WorkerApp.Models.WorkItemEntity", b =>
-                {
-                    b.Navigation("Fields");
                 });
 #pragma warning restore 612, 618
         }

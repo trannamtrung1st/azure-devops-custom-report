@@ -12,14 +12,12 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<WorkItemEntity> WorkItems => Set<WorkItemEntity>();
-    public DbSet<WorkItemFieldEntity> WorkItemFields => Set<WorkItemFieldEntity>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new WorkItemEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new WorkItemFieldEntityConfiguration());
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

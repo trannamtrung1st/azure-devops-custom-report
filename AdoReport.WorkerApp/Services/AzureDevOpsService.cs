@@ -141,7 +141,6 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
         foreach (var workItem in workItems)
         {
             var existingWorkItem = await _dbContext.WorkItems
-                .Include(w => w.Fields)
                 .FirstOrDefaultAsync(w => w.Id == workItem.Id, cancellationToken);
 
             if (existingWorkItem == null)
@@ -157,43 +156,13 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             existingWorkItem.Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty;
             existingWorkItem.State = workItem.Fields["System.State"]?.ToString() ?? string.Empty;
             existingWorkItem.Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty;
-
-            if (workItem.Fields.TryGetValue("System.AssignedTo", out object? value))
-            {
-                var assignedTo = value as IdentityRef;
-                existingWorkItem.AssignedTo = JsonSerializer.Serialize(assignedTo);
-            }
-            else
-            {
-                existingWorkItem.AssignedTo = null;
-            }
-
             existingWorkItem.AreaPath = workItem.Fields.ContainsKey("System.AreaPath") ? workItem.Fields["System.AreaPath"]?.ToString() : null;
             existingWorkItem.ParentId = workItem.Fields.ContainsKey("System.Parent") ? Convert.ToInt32(workItem.Fields["System.Parent"]) : null;
             existingWorkItem.CreatedDate = Convert.ToDateTime(workItem.Fields["System.CreatedDate"]);
             existingWorkItem.ChangedDate = workItem.Fields.ContainsKey("System.ChangedDate") ? Convert.ToDateTime(workItem.Fields["System.ChangedDate"]) : null;
 
-            // Update fields
-            var currentFields = existingWorkItem.Fields.ToDictionary(f => f.FieldName);
-
-            foreach (var field in workItem.Fields)
-            {
-                var fieldData = new WorkItemFieldData { Value = field.Value };
-                if (!currentFields.TryGetValue(field.Key, out var existingField))
-                {
-                    existingField = new WorkItemFieldEntity
-                    {
-                        WorkItemId = workItem.Id!.Value,
-                        FieldName = field.Key,
-                        FieldData = JsonSerializer.Serialize(fieldData)
-                    };
-                    existingWorkItem.Fields.Add(existingField);
-                }
-                else
-                {
-                    existingField.FieldData = JsonSerializer.Serialize(fieldData);
-                }
-            }
+            // Store all fields in the Fields dictionary
+            existingWorkItem.Fields = JsonSerializer.Serialize(workItem.Fields);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
