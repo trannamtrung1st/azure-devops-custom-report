@@ -2,7 +2,7 @@ using AdoReport.WorkerApp.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AdoReport.WorkerApp.Data.Configurations;
+namespace AdoReport.WorkerApp.Persistence.Configurations;
 
 public class WorkItemEntityConfiguration : IEntityTypeConfiguration<WorkItemEntity>
 {

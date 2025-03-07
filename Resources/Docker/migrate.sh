@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rh --connectionstring="User ID=$POSTGRES_USER;Password=$POSTGRES_PASSWORD;Server=$POSTGRES_HOST;Port=$POSTGRES_PORT;Database=$POSTGRES_TARGET_DB;Pooling=true" --connstringadmin="User ID=$POSTGRES_USER;Password=$POSTGRES_PASSWORD;Server=$POSTGRES_HOST;Port=$POSTGRES_PORT;Database=$POSTGRES_ADMIN_DB;Pooling=true" --sqlfilesdirectory=Migrations --environmentnames=$ENV_NAME --databasetype=postgres --silent --wt=true

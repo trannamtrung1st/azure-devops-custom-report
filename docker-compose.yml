@@ -1,0 +1,8 @@
+services:
+  ado-report-migration:
+    image: ado-report-migration
+    build:
+      context: .
+      dockerfile: Resources/Docker/Dockerfile-migration
+    env_file:
+      - Resources/Docker/.env

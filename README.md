@@ -57,6 +57,13 @@ cd AdoReport.WorkerApp
 dotnet run
 ```
 
+### Running the Migration
+
+```bash
+docker compose -f docker-compose.yml up -d
+docker compose -f docker-compose.yml build
+```
+
 ## Code Style Standards
 
 This project uses EditorConfig, Directory.Build.props to enforce consistent code style across the codebase.

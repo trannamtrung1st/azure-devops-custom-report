@@ -1,8 +1,8 @@
-using AdoReport.WorkerApp.Data.Configurations;
+using AdoReport.WorkerApp.Persistence.Configurations;
 using AdoReport.WorkerApp.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace AdoReport.WorkerApp.Data;
+namespace AdoReport.WorkerApp.Persistence;
 
 public class AppDbContext : DbContext
 {

@@ -1,5 +1,5 @@
 using System.Text.Json;
-using AdoReport.WorkerApp.Data;
+using AdoReport.WorkerApp.Persistence;
 using AdoReport.WorkerApp.Models;
 using AdoReport.WorkerApp.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
