@@ -138,10 +138,14 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
 
     public async Task SaveWorkItemsToDatabase(IEnumerable<WorkItem> workItems, CancellationToken cancellationToken = default)
     {
+        var existingWorkItems = await _dbContext.WorkItems
+            .AsNoTracking().Where(w => workItems.Select(wi => wi.Id).Contains(w.Id))
+            .ToDictionaryAsync(w => w.Id, cancellationToken);
+        var affectedCount = 0;
+
         foreach (var workItem in workItems)
         {
-            var existingWorkItem = await _dbContext.WorkItems
-                .FirstOrDefaultAsync(w => w.Id == workItem.Id, cancellationToken);
+            var existingWorkItem = existingWorkItems!.GetValueOrDefault(workItem.Id!.Value);
 
             var changedBy = workItem.Fields["System.ChangedBy"] is IdentityRef changedByIdentity
                 ? changedByIdentity.UniqueName
@@ -162,6 +166,7 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
                     Fields = JsonSerializer.Serialize(workItem.Fields)
                 };
                 _dbContext.WorkItems.Add(existingWorkItem);
+                affectedCount++;
 
                 // Track initial state as a change (with null before state)
                 var change = new WorkItemChangeEntity
@@ -177,29 +182,44 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             else
             {
                 // Track changes before updating
-                await TrackChanges(existingWorkItem, workItem.Fields, changedBy);
+                var hasChanges = await TrackChanges(existingWorkItem, workItem.Fields, changedBy);
 
-                // Update the work item
-                existingWorkItem.Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty;
-                existingWorkItem.State = workItem.Fields["System.State"]?.ToString() ?? string.Empty;
-                existingWorkItem.Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty;
-                existingWorkItem.AreaPath = workItem.Fields.ContainsKey("System.AreaPath") ? workItem.Fields["System.AreaPath"]?.ToString() : null;
-                existingWorkItem.ParentId = workItem.Fields.ContainsKey("System.Parent") ? Convert.ToInt32(workItem.Fields["System.Parent"]) : null;
-                existingWorkItem.CreatedDate = Convert.ToDateTime(workItem.Fields["System.CreatedDate"]);
-                existingWorkItem.ChangedDate = workItem.Fields.ContainsKey("System.ChangedDate") ? Convert.ToDateTime(workItem.Fields["System.ChangedDate"]) : null;
-                existingWorkItem.Fields = JsonSerializer.Serialize(workItem.Fields);
+                if (hasChanges)
+                {
+                    // Update the work item
+                    existingWorkItem.Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty;
+                    existingWorkItem.State = workItem.Fields["System.State"]?.ToString() ?? string.Empty;
+                    existingWorkItem.Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty;
+                    existingWorkItem.AreaPath = workItem.Fields.TryGetValue("System.AreaPath", out var areaPath) ? areaPath?.ToString() : null;
+                    existingWorkItem.ParentId = workItem.Fields.TryGetValue("System.Parent", out var parentId) ? Convert.ToInt32(parentId) : null;
+                    existingWorkItem.CreatedDate = Convert.ToDateTime(workItem.Fields["System.CreatedDate"]);
+                    existingWorkItem.ChangedDate = workItem.Fields.TryGetValue("System.ChangedDate", out var changedDate) ? Convert.ToDateTime(changedDate) : null;
+                    existingWorkItem.Fields = JsonSerializer.Serialize(workItem.Fields);
+
+                    _dbContext.Update(existingWorkItem);
+                    affectedCount++;
+                }
             }
         }
 
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        _logger.LogInformation("Saved {count} work items to database", workItems.Count());
+        if (affectedCount > 0)
+        {
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation("Saved {count} work items to database", affectedCount);
+        }
     }
 
     public async Task SaveAllWorkItemsToDatabase(CancellationToken cancellationToken = default)
     {
         var userStories = await QueryTrackingUserStories(cancellationToken);
         userStories = userStories.Where(us => us.Id.HasValue);
+        var activeUsIds = userStories.Select(us => us.Id!.Value).ToArray();
         await SaveWorkItemsToDatabase(userStories, cancellationToken);
+        var closedUsIds = await _dbContext.WorkItems
+            .AsNoTracking().Where(w => w.Type == "User Story" && !activeUsIds.Contains(w.Id))
+            .Select(w => w.Id)
+            .ToArrayAsync(cancellationToken);
+        await CloseWorkItems(closedUsIds, cancellationToken);
 
         foreach (var usBatch in userStories.Chunk(size: 20))
         {
@@ -210,8 +230,15 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
         }
     }
 
+    private async Task CloseWorkItems(IEnumerable<int> workItemIds, CancellationToken cancellationToken = default)
+    {
+        var workItems = await _dbContext.WorkItems.Where(w => workItemIds.Contains(w.Id)).ToListAsync(cancellationToken);
+        workItems.ForEach(w => w.State = "Closed");
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Closed {count} work items", workItems.Count);
+    }
 
-    private async Task TrackChanges(WorkItemEntity existingWorkItem, IDictionary<string, object?> newFields, string changedBy)
+    private async Task<bool> TrackChanges(WorkItemEntity existingWorkItem, IDictionary<string, object?> newFields, string changedBy)
     {
         var beforeFields = new Dictionary<string, object?>();
         var afterFields = new Dictionary<string, object?>();
@@ -249,8 +276,9 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             }
         }
 
+        var hasChanges = beforeFields.Count > 0 || afterFields.Count > 0;
         // Only create change record if there are actual changes
-        if (beforeFields.Count > 0 || afterFields.Count > 0)
+        if (hasChanges)
         {
             var change = new WorkItemChangeEntity
             {
@@ -264,6 +292,8 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             _dbContext.WorkItemChanges.Add(change);
             await _dbContext.SaveChangesAsync();
         }
+
+        return hasChanges;
     }
 
     private static bool IsJsonSemanticallyEqual(JsonElement a, JsonElement b)
