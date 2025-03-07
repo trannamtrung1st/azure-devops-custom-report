@@ -37,6 +37,7 @@ SELECT
     END AS "US Status",
     wi."Fields" ->> 'System.State' AS "State",
     COALESCE(up."Current Progress", 0) AS "Current Progress",
+    wi."Fields" ->> 'Microsoft.VSTS.Common.Priority' AS "Priority",
     COALESCE(up."Actual Effort", 0) AS "Actual Effort",
     wi."Fields" ->> 'Custom.TotalDevEffort' AS "Estimated Dev Effort",
     wi."Fields" ->> 'Custom.TotalQCEffort' AS "Estimated QC Effort",
