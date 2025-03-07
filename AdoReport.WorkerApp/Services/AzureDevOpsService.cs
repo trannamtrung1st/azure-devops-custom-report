@@ -219,7 +219,9 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
             .AsNoTracking().Where(w => w.Type == "User Story" && !activeUsIds.Contains(w.Id))
             .Select(w => w.Id)
             .ToArrayAsync(cancellationToken);
-        await CloseWorkItems(closedUsIds, cancellationToken);
+
+        if (closedUsIds.Length > 0)
+            await CloseWorkItems(closedUsIds, cancellationToken);
 
         foreach (var usBatch in userStories.Chunk(size: 20))
         {
