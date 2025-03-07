@@ -7,6 +7,7 @@ namespace AdoReport.WorkerApp.Services.Abstractions;
 /// </summary>
 public interface IAzureDevOpsService
 {
+    Task<IEnumerable<WorkItem>> QueryTrackingEpicAndFeatures(CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkItem>> QueryTrackingUserStories(CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkItem>> QueryTrackingTasks(IEnumerable<int> userStoryIds, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkItem>> QueryTrackingBugs(IEnumerable<int> userStoryIds, CancellationToken cancellationToken = default);

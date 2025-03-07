@@ -15,6 +15,8 @@ namespace AdoReport.WorkerApp.Services;
 /// </summary>
 public class AzureDevOpsService : IAzureDevOpsService
 {
+    private const int DefaultDaysToTrack = 180;
+
     private readonly string _organization;
     private readonly string _project;
     private readonly string _personalAccessToken;
@@ -33,17 +35,33 @@ public class AzureDevOpsService : IAzureDevOpsService
         _dbContext = dbContext;
     }
 
+    public async Task<IEnumerable<WorkItem>> QueryTrackingEpicAndFeatures(CancellationToken cancellationToken = default)
+    {
+        var wiql = new Wiql()
+        {
+            Query = @$"
+SELECT * FROM WorkItems
+WHERE [System.WorkItemType] IN ('Feature', 'Epic')
+AND [Area Path] UNDER 'Asset Backlogs'
+AND [System.State] NOT IN ('Removed', 'Closed')
+"
+        };
+
+        return await QueryWorkItems(wiql, cancellationToken);
+    }
+
     public async Task<IEnumerable<WorkItem>> QueryTrackingUserStories(CancellationToken cancellationToken = default)
     {
         var wiql = new Wiql()
         {
-            Query = @"
+            Query = @$"
 SELECT * FROM WorkItems
 WHERE [System.WorkItemType] = 'User Story'
-AND [System.State] NOT IN ('Removed', 'Closed')
-AND [System.State] EVER 'Active'
 AND [Area Path] UNDER 'Asset Backlogs'
 AND [Area Path] NOT IN ('Asset Backlogs\Story Pool')
+AND [System.State] EVER 'Active'
+AND [System.State] NOT IN ('Removed', 'Closed')
+AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 "
         };
 
@@ -59,6 +77,7 @@ SELECT * FROM WorkItems
 WHERE [System.WorkItemType] = 'Task'
 AND [System.State] NOT IN ('Removed')
 AND [System.Parent] IN ({string.Join(",", userStoryIds)})
+AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 "
         };
 
@@ -74,6 +93,7 @@ SELECT * FROM WorkItems
 WHERE [System.WorkItemType] = 'Bug'
 AND [System.State] NOT IN ('Removed')
 AND [System.Parent] IN ({string.Join(",", userStoryIds)})
+AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 "
         };
 
@@ -211,6 +231,9 @@ AND [System.Parent] IN ({string.Join(",", userStoryIds)})
 
     public async Task SaveAllWorkItemsToDatabase(CancellationToken cancellationToken = default)
     {
+        var epicAndFeatures = await QueryTrackingEpicAndFeatures(cancellationToken);
+        await SaveWorkItemsToDatabase(epicAndFeatures, cancellationToken);
+
         var userStories = await QueryTrackingUserStories(cancellationToken);
         userStories = userStories.Where(us => us.Id.HasValue);
         var activeUsIds = userStories.Select(us => us.Id!.Value).ToArray();

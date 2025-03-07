@@ -1,8 +1,9 @@
-CREATE
-OR REPLACE VIEW "UsSprintsInfo" AS WITH sc AS (
+DROP VIEW IF EXISTS "UsSprintsInfo";
+
+CREATE VIEW "UsSprintsInfo" AS WITH sc AS (
     SELECT
         wic."WorkItemId" "Id",
-        COUNT(wic."WorkItemId") + 1 "SprintCycle"
+        COUNT(wic."WorkItemId") + 1 "Sprint Cycle"
     FROM
         "WorkItemChanges" wic
     WHERE
@@ -25,7 +26,7 @@ sp AS (
                     wic."ChangedDate"
             ),
             ' / '
-        ) as "SprintPath"
+        ) as "Sprint Path"
     FROM
         "WorkItemChanges" wic
     WHERE
@@ -35,8 +36,8 @@ sp AS (
 )
 SELECT
     wi."Id",
-    coalesce(sc."SprintCycle", 1) "SprintCycle",
-    sp."SprintPath"
+    coalesce(sc."Sprint Cycle", 1) "Sprint Cycle",
+    sp."Sprint Path"
 FROM
     "WorkItems" wi
     LEFT JOIN sc ON wi."Id" = sc."Id"
