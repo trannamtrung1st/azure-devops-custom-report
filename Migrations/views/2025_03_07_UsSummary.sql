@@ -15,8 +15,16 @@ SELECT
     wi."Fields" ->> 'Microsoft.VSTS.Scheduling.StoryPoints' AS "Story Points",
     usi."Sprint Cycle",
     usi."Sprint Path",
-    wi."Fields" -> 'Custom.FEby' ->> 'UniqueName' AS "FE by",
-    wi."Fields" -> 'Custom.BEby' ->> 'UniqueName' AS "BE by",
+    SPLIT_PART(
+        wi."Fields" -> 'Custom.FEby' ->> 'UniqueName',
+        '@',
+        1
+    ) AS "FE Engineer",
+    SPLIT_PART(
+        wi."Fields" -> 'Custom.BEby' ->> 'UniqueName',
+        '@',
+        1
+    ) AS "BE Engineer",
     CASE
         WHEN wi."Fields" ->> 'System.State' = 'New' THEN 'New'
         WHEN wi."Fields" ->> 'System.State' = 'Active' THEN 'Active'
