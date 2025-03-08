@@ -64,6 +64,12 @@ docker compose -f docker-compose.yml up -d
 docker compose -f docker-compose.yml build
 ```
 
+### Publish local application
+
+```bash
+ngrok http --domain=absolute-woodcock-glorious.ngrok-free.app 8088
+```
+
 ## Code Style Standards
 
 This project uses EditorConfig, Directory.Build.props to enforce consistent code style across the codebase.
