@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS "UsProgress";
-
-CREATE VIEW "UsProgress" AS WITH UsEfforts AS (
+CREATE
+OR REPLACE VIEW "UsProgress" AS WITH UsEfforts AS (
     SELECT
         wi."ParentId" as "Id",
         SUM(
@@ -35,7 +34,7 @@ SELECT
     wi."Completed Work",
     wi."Remaining Work" + wi."Completed Work" AS "Actual Effort",
     CASE
-        WHEN wi."Remaining Work" + wi."Completed Work" = 0 THEN 100
+        WHEN wi."Remaining Work" + wi."Completed Work" = 0 THEN 0
         ELSE ROUND(
             (
                 wi."Completed Work" / (wi."Remaining Work" + wi."Completed Work")

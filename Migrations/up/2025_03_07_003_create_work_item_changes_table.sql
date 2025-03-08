@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS "WorkItemChanges" (
     "Id" SERIAL PRIMARY KEY,
     "WorkItemId" integer NOT NULL,
+    "Rev" integer DEFAULT NULL,
     "ChangedDate" timestamp with time zone NOT NULL,
     "ChangedBy" character varying(256) NOT NULL,
     "BeforeFields" jsonb,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "WorkItemChanges" (
 );
 
 CREATE INDEX "IX_WorkItemChanges_WorkItemId" ON "WorkItemChanges"("WorkItemId");
+CREATE INDEX "IX_WorkItemChanges_Rev" ON "WorkItemChanges"("Rev");
 CREATE INDEX "IX_WorkItemChanges_ChangedDate" ON "WorkItemChanges"("ChangedDate");
 CREATE INDEX "IX_WorkItemChanges_ChangedBy" ON "WorkItemChanges"("ChangedBy");
 CREATE INDEX "IX_WorkItemChanges_BeforeFields" ON "WorkItemChanges" USING gin ("BeforeFields");

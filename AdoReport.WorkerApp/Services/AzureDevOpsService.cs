@@ -13,26 +13,44 @@ namespace AdoReport.WorkerApp.Services;
 /// <summary>
 /// Service for interacting with Azure DevOps
 /// </summary>
-public class AzureDevOpsService : IAzureDevOpsService
+public class AzureDevOpsService : IAzureDevOpsService, IDisposable
 {
-    private const int DefaultDaysToTrack = 180;
+    private const string SystemIdentity = "System";
+    private static readonly string[] _nonTrackingFields =
+    [
+        "System.Description",
+        "System.History",
+        "Microsoft.VSTS.Common.AcceptanceCriteria",
+        "Custom.BendendTechnicalApproach",
+        "Custom.FrontendTechnicalApproach"
+    ];
 
+    private readonly int _daysToTrack;
+    private readonly DateTime _trackChangesSince;
     private readonly string _organization;
     private readonly string _project;
     private readonly string _personalAccessToken;
     private readonly ILogger<AzureDevOpsService> _logger;
     private readonly AppDbContext _dbContext;
+    private readonly WorkItemTrackingHttpClient _witClient;
+    private readonly VssConnection _connection;
 
     public AzureDevOpsService(
         IConfiguration configuration,
         ILogger<AzureDevOpsService> logger,
         AppDbContext dbContext)
     {
+        _daysToTrack = configuration.GetValue<int>("AppSettings:DaysToTrack");
+        _trackChangesSince = configuration.GetValue<DateTime>("AppSettings:TrackChangesSince");
         _organization = configuration["AzureDevOps:Organization"] ?? throw new ArgumentNullException("AzureDevOps:Organization");
         _project = configuration["AzureDevOps:Project"] ?? throw new ArgumentNullException("AzureDevOps:Project");
         _personalAccessToken = configuration["AzureDevOps:PersonalAccessToken"] ?? throw new ArgumentNullException("AzureDevOps:PersonalAccessToken");
         _logger = logger;
         _dbContext = dbContext;
+
+        var credentials = new VssBasicCredential(string.Empty, _personalAccessToken);
+        _connection = new VssConnection(new Uri($"https://dev.azure.com/{_organization}"), credentials);
+        _witClient = _connection.GetClient<WorkItemTrackingHttpClient>();
     }
 
     public async Task<IEnumerable<WorkItem>> QueryTrackingEpicAndFeatures(CancellationToken cancellationToken = default)
@@ -61,7 +79,7 @@ AND [Area Path] UNDER 'Asset Backlogs'
 AND [Area Path] NOT IN ('Asset Backlogs\Story Pool')
 AND [System.State] EVER 'Active'
 AND [System.State] NOT IN ('Removed', 'Closed')
-AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
+AND [System.ChangedDate] >= @Today - {_daysToTrack}
 "
         };
 
@@ -77,7 +95,7 @@ SELECT * FROM WorkItems
 WHERE [System.WorkItemType] = 'Task'
 AND [System.State] NOT IN ('Removed')
 AND [System.Parent] IN ({string.Join(",", userStoryIds)})
-AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
+AND [System.ChangedDate] >= @Today - {_daysToTrack}
 "
         };
 
@@ -93,7 +111,7 @@ SELECT * FROM WorkItems
 WHERE [System.WorkItemType] = 'Bug'
 AND [System.State] NOT IN ('Removed')
 AND [System.Parent] IN ({string.Join(",", userStoryIds)})
-AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
+AND [System.ChangedDate] >= @Today - {_daysToTrack}
 "
         };
 
@@ -102,16 +120,12 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 
     public async Task<IEnumerable<WorkItem>> QueryWorkItems(Wiql wiql, CancellationToken cancellationToken = default)
     {
-        var credentials = new VssBasicCredential(string.Empty, _personalAccessToken);
-        var connection = new VssConnection(new Uri($"https://dev.azure.com/{_organization}"), credentials);
-        var witClient = connection.GetClient<WorkItemTrackingHttpClient>();
-
-        var result = await witClient.QueryByWiqlAsync(wiql, project: _project, cancellationToken: cancellationToken);
+        var result = await _witClient.QueryByWiqlAsync(wiql, project: _project, cancellationToken: cancellationToken);
         var workItems = new List<WorkItem>();
 
         foreach (var batch in result.WorkItems.Chunk(size: 200))
         {
-            var currentBatch = await witClient.GetWorkItemsAsync(
+            var currentBatch = await _witClient.GetWorkItemsAsync(
                 project: _project,
                 ids: batch.Select(wi => wi.Id),
                 expand: WorkItemExpand.All,
@@ -123,20 +137,9 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 
         workItems.ForEach(wi =>
         {
-            if (wi.Fields.ContainsKey("System.Description"))
-                wi.Fields.Remove("System.Description");
-
-            if (wi.Fields.ContainsKey("System.History"))
-                wi.Fields.Remove("System.History");
-
-            if (wi.Fields.ContainsKey("Microsoft.VSTS.Common.AcceptanceCriteria"))
-                wi.Fields.Remove("Microsoft.VSTS.Common.AcceptanceCriteria");
-
-            if (wi.Fields.ContainsKey("Custom.BendendTechnicalApproach"))
-                wi.Fields.Remove("Custom.BendendTechnicalApproach");
-
-            if (wi.Fields.ContainsKey("Custom.FrontendTechnicalApproach"))
-                wi.Fields.Remove("Custom.FrontendTechnicalApproach");
+            foreach (var nonTrackingField in _nonTrackingFields)
+                if (wi.Fields.ContainsKey(nonTrackingField))
+                    wi.Fields.Remove(nonTrackingField);
         });
 
         return workItems;
@@ -169,44 +172,37 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
 
             var changedBy = workItem.Fields["System.ChangedBy"] is IdentityRef changedByIdentity
                 ? changedByIdentity.UniqueName
-                : "system";
+                : SystemIdentity;
 
             if (existingWorkItem == null)
             {
-                existingWorkItem = new WorkItemEntity
+                var newWorkItem = new WorkItemEntity
                 {
                     Id = workItem.Id!.Value,
+                    Rev = workItem.Rev,
                     Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty,
                     State = workItem.Fields["System.State"]?.ToString() ?? string.Empty,
                     Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty,
-                    AreaPath = workItem.Fields.ContainsKey("System.AreaPath") ? workItem.Fields["System.AreaPath"]?.ToString() : null,
-                    ParentId = workItem.Fields.ContainsKey("System.Parent") ? Convert.ToInt32(workItem.Fields["System.Parent"]) : null,
+                    AreaPath = workItem.Fields.TryGetValue("System.AreaPath", out var areaPath) ? areaPath?.ToString() : null,
+                    ParentId = workItem.Fields.TryGetValue("System.Parent", out var parentId) ? Convert.ToInt32(parentId) : null,
                     CreatedDate = Convert.ToDateTime(workItem.Fields["System.CreatedDate"]),
-                    ChangedDate = workItem.Fields.ContainsKey("System.ChangedDate") ? Convert.ToDateTime(workItem.Fields["System.ChangedDate"]) : null,
+                    ChangedDate = workItem.Fields.TryGetValue("System.ChangedDate", out var changedDate) ? Convert.ToDateTime(changedDate) : null,
                     Fields = JsonSerializer.Serialize(workItem.Fields)
                 };
-                _dbContext.WorkItems.Add(existingWorkItem);
+                _dbContext.WorkItems.Add(newWorkItem);
                 affectedCount++;
 
-                // Track initial state as a change (with null before state)
-                var change = new WorkItemChangeEntity
-                {
-                    WorkItemId = workItem.Id!.Value,
-                    ChangedDate = DateTime.UtcNow,
-                    ChangedBy = changedBy,
-                    BeforeFields = null,
-                    AfterFields = JsonSerializer.Serialize(workItem.Fields)
-                };
-                _dbContext.WorkItemChanges.Add(change);
+                await SyncRevisions(newWorkItem.Id, skip: 0, take: workItem.Rev ?? 1, cancellationToken);
             }
             else
             {
                 // Track changes before updating
-                var hasChanges = await TrackChanges(existingWorkItem, workItem.Fields, changedBy);
+                var hasChanges = await TrySyncNewRevisions(existingWorkItem, workItem, cancellationToken);
 
                 if (hasChanges)
                 {
                     // Update the work item
+                    existingWorkItem.Rev = workItem.Rev;
                     existingWorkItem.Type = workItem.Fields["System.WorkItemType"]?.ToString() ?? string.Empty;
                     existingWorkItem.State = workItem.Fields["System.State"]?.ToString() ?? string.Empty;
                     existingWorkItem.Title = workItem.Fields["System.Title"]?.ToString() ?? string.Empty;
@@ -263,7 +259,84 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
         _logger.LogInformation("Closed {count} work items", workItems.Count);
     }
 
+    private async Task<bool> TrySyncNewRevisions(WorkItemEntity existingWorkItem, WorkItem remoteWorkItem, CancellationToken cancellationToken)
+    {
+        if (existingWorkItem.Rev >= remoteWorkItem.Rev)
+            return false;
+
+        var skip = existingWorkItem.Rev;
+        var take = remoteWorkItem.Rev - existingWorkItem.Rev;
+        await SyncRevisions(existingWorkItem.Id, skip ?? 0, take ?? 1, cancellationToken);
+        return true;
+    }
+
+    private static bool IsNonTrackingField(string field) => _nonTrackingFields.Contains(field);
+
+    private async Task SyncRevisions(int workItemId, int skip, int take, CancellationToken cancellationToken)
+    {
+        const int MaxTake = 100;
+        _logger.LogDebug("Syncing revisions for work item {id}, skip: {skip}, take: {take}", workItemId, skip, take);
+        var changes = new List<WorkItemChangeEntity>();
+
+        async Task SyncRevisions(int skip, int take)
+        {
+            var updates = await _witClient.GetUpdatesAsync(
+                project: _project,
+                id: workItemId,
+                skip: skip,
+                top: take,
+                cancellationToken: cancellationToken);
+
+            foreach (var update in updates)
+            {
+                if (update.RevisedDate < _trackChangesSince)
+                    continue;
+
+                var before = new Dictionary<string, object>();
+                var after = new Dictionary<string, object>();
+
+                if (update.Fields?.Count > 0)
+                {
+                    foreach (var field in update.Fields)
+                    {
+                        if (IsNonTrackingField(field.Key))
+                            continue;
+
+                        before[field.Key] = field.Value.OldValue;
+                        after[field.Key] = field.Value.NewValue;
+                    }
+                }
+
+                var change = new WorkItemChangeEntity
+                {
+                    WorkItemId = workItemId,
+                    Rev = update.Rev,
+                    ChangedDate = update.RevisedDate,
+                    ChangedBy = update.RevisedBy.UniqueName ?? SystemIdentity,
+                    BeforeFields = JsonSerializer.Serialize(before),
+                    AfterFields = JsonSerializer.Serialize(after),
+                };
+                changes.Add(change);
+            }
+        }
+
+        while (take > MaxTake)
+        {
+            await SyncRevisions(skip, MaxTake);
+            skip += MaxTake;
+            take -= MaxTake;
+        }
+
+        if (take > 0)
+            await SyncRevisions(skip, take);
+
+        await _dbContext.WorkItemChanges.AddRangeAsync(changes, cancellationToken);
+    }
+
+    [Obsolete]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     private async Task<bool> TrackChanges(WorkItemEntity existingWorkItem, IDictionary<string, object?> newFields, string changedBy)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         var beforeFields = new Dictionary<string, object?>();
         var afterFields = new Dictionary<string, object?>();
@@ -309,13 +382,12 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
             {
                 WorkItemId = existingWorkItem.Id,
                 ChangedDate = DateTime.UtcNow,
-                ChangedBy = changedBy,
+                ChangedBy = changedBy ?? SystemIdentity,
                 BeforeFields = JsonSerializer.Serialize(beforeFields),
                 AfterFields = JsonSerializer.Serialize(afterFields)
             };
 
             _dbContext.WorkItemChanges.Add(change);
-            await _dbContext.SaveChangesAsync();
         }
 
         return hasChanges;
@@ -384,5 +456,12 @@ AND [System.ChangedDate] >= @Today - {DefaultDaysToTrack}
             default:
                 return false;
         }
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _witClient.Dispose();
+        _connection.Dispose();
     }
 }

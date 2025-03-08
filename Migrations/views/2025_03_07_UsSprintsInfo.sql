@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS "UsSprintsInfo";
-
-CREATE VIEW "UsSprintsInfo" AS WITH sc AS (
+CREATE
+OR REPLACE VIEW "UsSprintsInfo" AS WITH sc AS (
     SELECT
         wic."WorkItemId" "Id",
         COUNT(wic."WorkItemId") + 1 "Sprint Cycle"

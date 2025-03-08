@@ -4,6 +4,7 @@ public class WorkItemChangeEntity
 {
     public int Id { get; set; }
     public int WorkItemId { get; set; }
+    public int? Rev { get; set; }
     public DateTime ChangedDate { get; set; }
     public string ChangedBy { get; set; } = string.Empty;
     public string? BeforeFields { get; set; }

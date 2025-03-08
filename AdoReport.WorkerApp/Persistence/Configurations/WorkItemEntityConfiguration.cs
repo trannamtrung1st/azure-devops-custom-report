@@ -30,6 +30,7 @@ public class WorkItemEntityConfiguration : IEntityTypeConfiguration<WorkItemEnti
         builder.Property(e => e.Fields)
             .HasColumnType("jsonb");
 
+        builder.HasIndex(e => e.Rev);
         builder.HasIndex(e => e.Type);
         builder.HasIndex(e => e.State);
         builder.HasIndex(e => e.AreaPath);

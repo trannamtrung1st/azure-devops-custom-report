@@ -30,6 +30,7 @@ public class WorkItemChangeEntityConfiguration : IEntityTypeConfiguration<WorkIt
 
         // Create indexes
         builder.HasIndex(e => e.WorkItemId);
+        builder.HasIndex(e => e.Rev);
         builder.HasIndex(e => e.ChangedDate);
         builder.HasIndex(e => e.ChangedBy);
 

@@ -1,6 +1,5 @@
-DROP VIEW IF EXISTS "UsSummary";
-
-CREATE VIEW "UsSummary" AS
+CREATE
+OR REPLACE VIEW "UsSummary" AS
 SELECT
     wi."Fields" ->> 'System.AreaLevel2' AS "Team",
     wi."Fields" ->> 'System.IterationLevel2' AS "Sprint",
@@ -36,7 +35,8 @@ SELECT
     END AS "US Status",
     wi."Fields" ->> 'System.State' AS "State",
     COALESCE(up."Current Progress", 0) AS "Current Progress",
-    (wi."Fields" ->> 'Microsoft.VSTS.Common.Priority')::float AS "Priority",
+    (wi."Fields" ->> 'Microsoft.VSTS.Common.Priority') :: float AS "Priority",
+    COALESCE(up."Remaining Work", 0) AS "Remaining Work",
     COALESCE(up."Actual Effort", 0) AS "Actual Effort",
     wi."Fields" ->> 'Custom.TotalDevEffort' AS "Estimated Dev Effort",
     wi."Fields" ->> 'Custom.TotalQCEffort' AS "Estimated QC Effort",

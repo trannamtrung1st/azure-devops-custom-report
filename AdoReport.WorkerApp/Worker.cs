@@ -9,11 +9,13 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IConfiguration _configuration;
 
-    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider)
+    public Worker(ILogger<Worker> logger, IServiceProvider serviceProvider, IConfiguration configuration)
     {
         _logger = logger;
         _serviceProvider = serviceProvider;
+        _configuration = configuration;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -37,8 +39,8 @@ public class Worker : BackgroundService
                 _logger.LogError(ex, "An error occurred while processing work items");
             }
 
-            // Wait for 1 hour before running again
-            await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+            var intervalHours = _configuration.GetValue<int>("AppSettings:IntervalHours");
+            await Task.Delay(TimeSpan.FromHours(intervalHours), stoppingToken);
         }
     }
 }

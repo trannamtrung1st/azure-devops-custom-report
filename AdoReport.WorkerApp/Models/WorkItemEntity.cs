@@ -3,6 +3,7 @@ namespace AdoReport.WorkerApp.Models;
 public class WorkItemEntity
 {
     public int Id { get; set; }
+    public int? Rev { get; set; }
     public string Type { get; set; } = string.Empty;
     public string State { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS "WorkItems" (
     "Id" integer NOT NULL,
+    "Rev" integer DEFAULT NULL,
     "Type" character varying(100) NOT NULL,
     "State" character varying(100) NOT NULL,
     "Title" character varying(500) NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS "WorkItems" (
 );
 
 CREATE INDEX "IX_WorkItems_Type" ON "WorkItems"("Type");
+CREATE INDEX "IX_WorkItems_Rev" ON "WorkItems"("Rev");
 CREATE INDEX "IX_WorkItems_State" ON "WorkItems"("State");
 CREATE INDEX "IX_WorkItems_AreaPath" ON "WorkItems"("AreaPath");
 CREATE INDEX "IX_WorkItems_ParentId" ON "WorkItems"("ParentId");
