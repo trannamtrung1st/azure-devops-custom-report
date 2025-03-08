@@ -76,4 +76,5 @@ FROM
     LEFT JOIN "UsProgress" up ON wi."Id" = up."Id"
     LEFT JOIN "UsSprintsInfo" usi ON wi."Id" = usi."Id"
 WHERE
-    wi."Type" = 'User Story';
+    wi."Type" = 'User Story'
+    AND wi."Fields" ->> 'System.IterationLevel2' IS NOT NULL;
